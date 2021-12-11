@@ -11,3 +11,5 @@ Hello, World!!!
 - не игнорируется файл example_override.tf - не игнорируюися все файлы содержащие в названии tfplan (tfplan) 
 - игнорируюися конфигурационные файлы .terraformrc и terraform.rc
 ```
+
+switch to "fix" branch
