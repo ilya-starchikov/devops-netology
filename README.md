@@ -156,18 +156,22 @@ echo "Next parameter: $param"
 
 1. Найдите полный хеш и комментарий коммита, хеш которого начинается на ```aefea```.
 ```
+% git show aefea
 aefead2207ef7e2aa5dc81a34aedf0cad4c32545
 ```
 2. Какому тегу соответствует коммит ```85024d3```?
 ```
+% git show 85024d3
 tag: v0.12.23
 ```
 3. Сколько родителей у коммита ```b8d720```? Напишите их хеши.
 ```
+% git log --pretty=%P -n 1 b8d720
 2 родителя: 56cd7859e05c36c06b56d013b55a252d0bb7e158 9ea88f22fc6269854151c571162c5bcf958bee2b
 ```
 4. Перечислите хеши и комментарии всех коммитов которые были сделаны между тегами ```v0.12.23``` и ```v0.12.24```.
 ```
+% git log v0.12.23...v0.12.24
 commit 33ff1c03bb960b332be3af2e333462dde88b279e (tag: v0.12.24)
 Author: tf-release-bot <terraform@hashicorp.com>
 Date:   Thu Mar 19 15:04:05 2020 +0000
@@ -241,15 +245,24 @@ Date:   Thu Mar 5 21:12:06 2020 +0000
 ```
 5. Найдите коммит в котором была создана функция ```func providerSource```, ее определение в коде выглядит так func providerSource(...) (вместо троеточего перечислены аргументы).
 ```
-5af1e6234ab6da412fb8637393c5a17a1b293663
+% git log -S"func providerSource"
+```
+Выбрал по наименьшей дате ```commit```
+```
+8c928e83589d90a031f811fae52a81be7153e82f
 ```
 6. Найдите все коммиты в которых была изменена функция ```globalPluginDirs```.
 ```
+% git log -S globalPluginDirs --oneline
 35a058fb3 main: configure credentials from the CLI config file
 c0b176109 prevent log output during init
 8364383c3 Push plugin discovery down into command package
 ```
 7. Кто автор функции ```synchronizedWriters```?
+```
+% git log -S synchronizedWriters
+```
+Выбрал по наименьшей дате ```commit```
 ```
 Author: Martin Atkins <mart@degeneration.co.uk>
 ```
