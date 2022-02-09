@@ -895,7 +895,7 @@ Status Code: 301 Moved Permanently
 Время загрузки страницы - 393мс
 Дольшего всего выполнялся js - 891.05мс
 
-
+![dev-tools](https://github.com/ilya-starchikov/devops-netology/blob/main/dev-tools.png)
 ```
 3. Какой IP адрес у вас в интернете?
 ```
