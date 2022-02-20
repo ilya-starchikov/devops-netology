@@ -1052,11 +1052,80 @@ iface bond0 inet static
 ```
 6. Задача: вас попросили организовать стык между 2-мя организациями. Диапазоны 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 уже заняты. Из какой подсети допустимо взять частные IP адреса? Маску выберите из расчета максимум 40-50 хостов внутри подсети.
 ```
-100.64.0.0/26
+100.64x.0.0/26
 ```
 7. Как проверить ARP таблицу в Linux, Windows? Как очистить ARP кеш полностью? Как из ARP таблицы удалить только один нужный IP?
 ```
 arp #таблица arp
 ip -s -s neigh flush all #очистить кэш полностью
 arp -d 192.168.1.1 #удалить конкретный адрес
+```
+# ДЗ "3.8. Компьютерные сети, лекция 3"
+1. Подключитесь к публичному маршрутизатору в интернет. Найдите маршрут к вашему публичному IP
+```
+root@vagrant:~# curl ifconfig.me
+185.57.29.48
+
+route-views>show ip route | i 185.57.29.0
+B        185.57.29.0/24 [20/0] via 64.71.137.241, 1d09h
+
+route-views>show bgp | i 185.57.29.0
+N*   185.57.29.0/24   217.192.89.50                          0 3303 12389 44724 i
+```
+2. Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.
+```
+modprobe -v dummy
+ip link add dummy0 type dummy
+ip link set dev dummy0 up
+ip addr add 192.168.1.57/24 dev dummy0
+ip route add 172.16.36.27/32 dev dummy0
+
+root@vagrant:~# ip -c a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:b1:28:5d brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic eth0
+       valid_lft 84302sec preferred_lft 84302sec
+    inet6 fe80::a00:27ff:feb1:285d/64 scope link
+       valid_lft forever preferred_lft forever
+3: dummy0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/ether 52:84:74:f8:ce:3c brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.57/24 scope global dummy0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::5084:74ff:fef8:ce3c/64 scope link
+       valid_lft forever preferred_lft forever
+       
+
+root@vagrant:~# ip r
+default via 10.0.2.2 dev eth0 proto dhcp src 10.0.2.15 metric 100
+10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15
+10.0.2.2 dev eth0 proto dhcp scope link src 10.0.2.15 metric 100
+172.16.36.27 dev dummy0 scope link
+192.168.1.0/24 dev dummy0 proto kernel scope link src 192.168.1.57
+```
+3. Проверьте открытые TCP порты в Ubuntu, какие протоколы и приложения используют эти порты? Приведите несколько примеров.
+```
+root@vagrant:~# ss -tlpn
+State               Recv-Q              Send-Q                           Local Address:Port                           Peer Address:Port             Process
+LISTEN              0                   4096                             127.0.0.53%lo:53                                  0.0.0.0:*                 users:(("systemd-resolve",pid=678,fd=13))
+LISTEN              0                   128                                    0.0.0.0:22                                  0.0.0.0:*                 users:(("sshd",pid=749,fd=3))
+LISTEN              0                   128                                       [::]:22                                     [::]:*                 users:(("sshd",pid=749,fd=4))
+root@vagrant:~#
+```
+4. Проверьте используемые UDP сокеты в Ubuntu, какие протоколы и приложения используют эти порты?
+```
+root@vagrant:~# ss -ulpn
+State               Recv-Q              Send-Q                            Local Address:Port                           Peer Address:Port             Process
+UNCONN              0                   0                                 127.0.0.53%lo:53                                  0.0.0.0:*                 users:(("systemd-resolve",pid=678,fd=12))
+UNCONN              0                   0                                10.0.2.15%eth0:68                                  0.0.0.0:*                 users:(("systemd-network",pid=676,fd=19))
+root@vagrant:~#
+```
+5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали.
+```
+![dev-tools](https://github.com/ilya-starchikov/devops-netology/blob/main/network.drawio.png)
 ```
