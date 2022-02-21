@@ -1127,5 +1127,128 @@ root@vagrant:~#
 ```
 5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали.
 ```
-![dev-tools](https://github.com/ilya-starchikov/devops-netology/blob/main/network.drawio.png)
+![network](https://github.com/ilya-starchikov/devops-netology/blob/main/network.drawio.png)
+```
+# ДЗ 3.9. Элементы безопасности информационных систем
+
+1. Установите Bitwarden плагин для браузера. Зарегестрируйтесь и сохраните несколько паролей.
+```
+![Bitwarden](https://github.com/ilya-starchikov/devops-netology/blob/main/bitwarden.png)
+```
+2. Установите Google authenticator на мобильный телефон. Настройте вход в Bitwarden акаунт через Google authenticator OTP.
+```
+Сделал, это просто ужасное приложение. 
+```
+3. Установите apache2, сгенерируйте самоподписанный сертификат, настройте тестовый сайт для работы по HTTPS.
+```
+vim /etc/apache2/test-srv.com/default-ssl.conf
+
+<IfModule mod_ssl.c>
+        <VirtualHost _default_:443>
+                ServerAdmin superadmin@test-srv.com
+                ServerName test-srv.com
+
+                DocumentRoot /var/www/html
+
+                ErrorLog ${APACHE_LOG_DIR}/error.log
+                CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+                SSLEngine on
+
+                SSLCertificateFile      /etc/ssl/certs/apache-selfsigned.crt
+                SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+
+                <FilesMatch "\.(cgi|shtml|phtml|php)$">
+                                SSLOptions +StdEnvVars
+                </FilesMatch>
+                <Directory /usr/lib/cgi-bin>
+                                SSLOptions +StdEnvVars
+                </Directory>
+
+        </VirtualHost>
+</IfModule>
+
+a2enmod ssl
+a2enmod headers
+a2ensite default-ssl
+a2enconf ssl-params
+
+vim /etc/apache2/sites-enabled/000-default
+<VirtualHost *:80>
+        . . .
+
+        Redirect permanent "/" "https://test-srv.com/"
+
+        . . .
+</VirtualHost>
+
+systemctl restart apache2
+```
+4. Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК ... и тому подобное).
+```
+root@vagrant:~/testssl.sh# ./testssl.sh -U --sneaky https://www.proplay.ru/
+
+rDNS (212.42.38.206):   www.proplay.ru.
+ Service detected:       HTTP
+
+
+ Testing vulnerabilities
+
+ Heartbleed (CVE-2014-0160)                not vulnerable (OK), timed out
+ CCS (CVE-2014-0224)                       not vulnerable (OK)
+ Ticketbleed (CVE-2016-9244), experiment.  not vulnerable (OK)
+ ROBOT                                     not vulnerable (OK)
+ Secure Renegotiation (RFC 5746)           supported (OK)
+ Secure Client-Initiated Renegotiation     not vulnerable (OK)
+ CRIME, TLS (CVE-2012-4929)                not vulnerable (OK)
+ BREACH (CVE-2013-3587)                    potentially NOT ok, "gzip" HTTP compression detected. - only supplied "/" tested
+                                           Can be ignored for static pages or if no secrets in the page
+ POODLE, SSL (CVE-2014-3566)               not vulnerable (OK)
+ TLS_FALLBACK_SCSV (RFC 7507)              Downgrade attack prevention supported (OK)
+ SWEET32 (CVE-2016-2183, CVE-2016-6329)    not vulnerable (OK)
+ FREAK (CVE-2015-0204)                     not vulnerable (OK)
+ DROWN (CVE-2016-0800, CVE-2016-0703)      not vulnerable on this host and port (OK)
+                                           make sure you don't use this certificate elsewhere with SSLv2 enabled services
+                                           https://censys.io/ipv4?q=0D95A3947E974E8D34FC0062463EC9AC9A2E73F2AC1E4049C91C3C9C7D253D48 could help you to find out
+ LOGJAM (CVE-2015-4000), experimental      not vulnerable (OK): no DH EXPORT ciphers, no DH key detected with <= TLS 1.2
+ BEAST (CVE-2011-3389)                     TLS1: ECDHE-RSA-AES256-SHA AES256-SHA CAMELLIA256-SHA ECDHE-RSA-AES128-SHA AES128-SHA CAMELLIA128-SHA
+                                           VULNERABLE -- but also supports higher protocols  TLSv1.1 TLSv1.2 (likely mitigated)
+ LUCKY13 (CVE-2013-0169), experimental     potentially VULNERABLE, uses cipher block chaining (CBC) ciphers with TLS. Check patches
+ Winshock (CVE-2014-6321), experimental    not vulnerable (OK) - CAMELLIA or ECDHE_RSA GCM ciphers found
+ RC4 (CVE-2013-2566, CVE-2015-2808)        no RC4 ciphers detected (OK)
+
+
+ Done 2022-02-20 13:01:14 [  96s] -->> 212.42.38.206:443 (www.proplay.ru) <<--
+```
+5. Установите на Ubuntu ssh сервер, сгенерируйте новый приватный ключ. Скопируйте свой публичный ключ на другой сервер. Подключитесь к серверу по SSH-ключу.
+```
+vm1: 
+ssh-keygen -t rsa
+cd ./ssh
+ssh-copy-id -i id_rsa.pub vagrant@10.20.2.5
+
+vm2:
+vim /etc/ssh/sshd_config
+PermitRootLogin no 
+PasswordAuthentication no 
+
+systemctl restart ssh.service
+ufw allow ssh
+```
+6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
+```
+mv ~/.ssh/id_dsa ~/.ssh/id_dsa_bla_bla
+vim ~/.ssh/config
+Host *
+  IdentitiesOnly yes
+Host test-vm2
+  Hostname 10.20.2.5
+  User vagrant
+  IdentityFile ~/.s sh/id_dsa_bla_bla
+```
+7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
+```
+tcpdump -ni lo0 -c 100 icmp -w test.dump
+
+![wireshark](https://github.com/ilya-starchikov/devops-netology/blob/main/wireshark.png)
 ```
