@@ -1146,7 +1146,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 (везде жал просто Enter, для создания apache-selfsigned.key ввел passphrase)
 
 Пример конфига apache:
-vim /etc/apache2/test-srv.com/default-ssl.conf
+vim /etc/apache2/sites-available/default-ssl.conf
 
 <IfModule mod_ssl.c>
         <VirtualHost _default_:443>
@@ -1188,6 +1188,18 @@ vim /etc/apache2/sites-enabled/000-default
 </VirtualHost>
 
 systemctl restart apache2
+
+в /etc/hosts добавлен test-srv.com
+
+root@vagrant:~# curl -s -I -XGET http://test-srv.com
+HTTP/1.1 302 Found
+Date: Thu, 03 Mar 2022 12:37:49 GMT
+Server: Apache/2.4.41 (Ubuntu)
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Location: https://test-srv.com/
+Content-Length: 277
+Content-Type: text/html; charset=iso-8859-1
 ```
 4. Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК ... и тому подобное).
 ```
