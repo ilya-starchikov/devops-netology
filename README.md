@@ -1141,6 +1141,11 @@ root@vagrant:~#
 ```
 3. Установите apache2, сгенерируйте самоподписанный сертификат, настройте тестовый сайт для работы по HTTPS.
 ```
+Генерируем самоподписанный сертификат:
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
+(везде жал просто Enter, для создания apache-selfsigned.key ввел passphrase)
+
+Пример конфига apache:
 vim /etc/apache2/test-srv.com/default-ssl.conf
 
 <IfModule mod_ssl.c>
@@ -1244,7 +1249,7 @@ Host *
 Host test-vm2
   Hostname 10.20.2.5
   User vagrant
-  IdentityFile ~/.s sh/id_dsa_bla_bla
+  IdentityFile ~/.ssh/id_dsa_bla_bla
 ```
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
 ```
