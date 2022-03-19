@@ -1327,7 +1327,7 @@ do
 for host in "192.168.0.1" "173.194.222.113" "87.250.250.242"
 do
 	echo "Try $host"
-	timeout 5 timeout 5 nc -vz $host 80 2>> curl.log
+	timeout 5 nc -vz $host 80 2>> curl.log
 	if (($? != 0))
 	then
 		echo "Can't connect to $host and port 80" >> curl.log
@@ -1347,7 +1347,7 @@ do
 for host in "192.168.0.1" "173.194.222.113" "87.250.250.242"
 do
 	echo "Try $host"
-	timeout 5 timeout 5 nc -vz $host 80 2>> curl.log
+	timeout 5 nc -vz $host 80 2>> curl.log
 	if (($? != 0))
 	then
 		echo "$host" >> error.log
