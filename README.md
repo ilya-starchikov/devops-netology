@@ -1526,13 +1526,42 @@ log
 journalctl -u cron.service
 ```
 ```commandline
-Apr 16 04:37:01 vagrant CRON[1726]: pam_unix(cron:session): session opened for user root by (uid=0)
-Apr 16 04:37:01 vagrant CRON[1727]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
-Apr 16 04:37:01 vagrant CRON[1726]: pam_unix(cron:session): session closed for user root
-Apr 16 04:38:01 vagrant CRON[1783]: pam_unix(cron:session): session opened for user root by (uid=0)
-Apr 16 04:38:01 vagrant CRON[1784]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
-Apr 16 04:38:01 vagrant CRON[1783]: pam_unix(cron:session): session closed for user root
-Apr 16 04:39:01 vagrant CRON[1817]: pam_unix(cron:session): session opened for user root by (uid=0)
-Apr 16 04:39:01 vagrant CRON[1818]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
-Apr 16 04:39:01 vagrant CRON[1817]: pam_unix(cron:session): session closed for user root
+Apr 16 04:41:01 vagrant CRON[1878]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:41:01 vagrant CRON[1879]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:41:02 vagrant CRON[1878]: pam_unix(cron:session): session closed for user root
+Apr 16 04:42:01 vagrant CRON[1906]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:42:01 vagrant CRON[1907]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:42:01 vagrant CRON[1906]: pam_unix(cron:session): session closed for user root
+Apr 16 04:43:01 vagrant CRON[1935]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:43:01 vagrant CRON[1936]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:43:01 vagrant CRON[1935]: pam_unix(cron:session): session closed for user root
+Apr 16 04:44:01 vagrant CRON[1992]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:44:01 vagrant CRON[1993]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:44:01 vagrant CRON[1992]: pam_unix(cron:session): session closed for user root
+Apr 16 04:45:01 vagrant CRON[2044]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:45:01 vagrant CRON[2045]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:45:02 vagrant CRON[2044]: pam_unix(cron:session): session closed for user root
+Apr 16 04:46:01 vagrant CRON[2076]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:46:01 vagrant CRON[2077]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:46:01 vagrant CRON[2076]: pam_unix(cron:session): session closed for user root
+```
+```commandline
+root@vagrant:/var/log# stat /etc/nginx/cert/test.example.com.key
+  File: /etc/nginx/cert/test.example.com.key
+  Size: 1675      	Blocks: 8          IO Block: 4096   regular file
+Device: fd00h/64768d	Inode: 669900      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2022-04-16 04:45:02.079701431 +0000
+Modify: 2022-04-16 04:45:02.067695430 +0000
+Change: 2022-04-16 04:45:02.067695430 +0000
+ Birth: -
+root@vagrant:/var/log# stat /etc/nginx/cert/test.example.com.crt
+  File: /etc/nginx/cert/test.example.com.crt
+  Size: 2567      	Blocks: 8          IO Block: 4096   regular file
+Device: fd00h/64768d	Inode: 668541      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2022-04-16 04:45:02.079701431 +0000
+Modify: 2022-04-16 04:45:02.035679429 +0000
+Change: 2022-04-16 04:45:02.035679429 +0000
+ Birth: -
 ```
