@@ -1521,3 +1521,18 @@ chmod +x /root/generate_cert.sh
 ```commandline
 echo "* 0 1 * * root /root/generate_cert.sh" >> /etc/crontab
 ```
+log
+```commandline
+journalctl -u cron.service
+```
+```commandline
+Apr 16 04:37:01 vagrant CRON[1726]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:37:01 vagrant CRON[1727]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:37:01 vagrant CRON[1726]: pam_unix(cron:session): session closed for user root
+Apr 16 04:38:01 vagrant CRON[1783]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:38:01 vagrant CRON[1784]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:38:01 vagrant CRON[1783]: pam_unix(cron:session): session closed for user root
+Apr 16 04:39:01 vagrant CRON[1817]: pam_unix(cron:session): session opened for user root by (uid=0)
+Apr 16 04:39:01 vagrant CRON[1818]: (root) CMD (/root/generate_cert.sh >> /var/log/cron.log 2>&1)
+Apr 16 04:39:01 vagrant CRON[1817]: pam_unix(cron:session): session closed for user root
+```
