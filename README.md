@@ -1365,3 +1365,159 @@ done
 ```bash
 ???
 ```
+
+### Курсовая работа по итогам модуля "DevOps и системное администрирование"
+
+Установите ufw и разрешите к этой машине сессии на порты 22 и 443, при этом трафик на интерфейсе localhost (lo) должен ходить свободно на все порты.
+```commandline
+ufw allow 22
+ufw allow 443
+ufw allow in on lo
+ufw allow out on lo
+ufw enable
+
+ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22                         ALLOW       Anywhere
+443                        ALLOW       Anywhere
+Anywhere on lo             ALLOW       Anywhere
+Anywhere                   ALLOW OUT   Anywhere on lo
+```
+
+Установите hashicorp vault
+```commandline
+wget https://hashicorp-releases.website.yandexcloud.net/vault/1.9.3/vault_1.9.3_linux_amd64.zip
+apt install unzip jq
+unzip vault_1.9.3_linux_amd64.zip
+mv vault /usr/local/bin/
+```
+
+Cоздайте центр сертификации по инструкции и выпустите сертификат для использования его в настройке веб-сервера nginx (срок жизни сертификата - месяц).
+```commandline
+Start Vault:
+vault server -dev -dev-root-token-id root
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+Step 1: Generate root CA:
+vault secrets enable pki
+vault secrets tune -max-lease-ttl=87600h pki
+vault write -field=certificate pki/root/generate/internal \
+     common_name="example.com" \
+     ttl=87600h > CA_cert.crt
+vault write pki/config/urls \
+     issuing_certificates="$VAULT_ADDR/v1/pki/ca" \
+     crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
+
+Step 2: Generate intermediate CA:
+vault secrets enable -path=pki_int pki
+vault secrets tune -max-lease-ttl=43800h pki_int
+vault write -format=json pki_int/intermediate/generate/internal \
+     common_name="example.com Intermediate Authority" \
+     | jq -r '.data.csr' > pki_intermediate.csr
+vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr \
+     format=pem_bundle ttl="43800h" \
+     | jq -r '.data.certificate' > intermediate.cert.pem
+vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
+
+Step 3: Create a role:
+vault write pki_int/roles/example-dot-com \
+     allowed_domains="example.com" \
+     allow_subdomains=true \
+     max_ttl="750h"
+
+Step 4: Request certificates:
+vault write -format=json pki_int/issue/example-dot-com common_name="test.example.com" ttl="750h" > /root/test.example.com.json
+```
+
+Установите корневой сертификат созданного центра сертификации в доверенные в хостовой системе.
+```commandline
+scp -P 2222 vagrant@127.0.0.1:/home/vagrant/CA_cert.crt .
+Добавил этот сертифакат в MAC OS в системную связку ключей
+![system](https://github.com/ilya-starchikov/devops-netology/blob/main/cert.png )
+```
+
+Установите nginx
+```commandline
+vim /etc/apt/sources.list.d/nginx.list
+```
+```commandline
+deb https://nginx.org/packages/ubuntu/ focal nginx
+deb-src https://nginx.org/packages/ubuntu/ focal nginx
+```
+```commandline
+apt update
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $key (key на который ругается)
+apt update
+apt install nginx
+
+nginx -version
+nginx version: nginx/1.20.2
+```
+
+По инструкции (ссылка) настройте nginx на https, используя ранее подготовленный сертификат:
+    - можно использовать стандартную стартовую страницу nginx для демонстрации работы сервера;
+    - можно использовать и другой html файл, сделанный вами;
+```commandline
+mkdir /etc/nginx/cert/
+
+cat /root/test.example.com.json | jq -r .data.certificate > /etc/nginx/cert/test.example.com.crt
+cat /root/test.example.com.json | jq -r .data.issuing_ca >> /etc/nginx/cert/test.example.com.crt
+cat /root/test.example.com.json | jq -r .data.private_key > /etc/nginx/cert/test.example.com.key
+```
+```commandline
+vim /etc/nginx/conf.d/default.conf
+```
+```commandline
+server {
+    listen       443 ssl;
+    server_name  test.example.com;
+
+    access_log  /var/log/nginx/host.access.log  main;
+    ssl_certificate	/etc/nginx/cert/test.example.com.crt;
+    ssl_certificate_key /etc/nginx/cert/test.example.com.key;
+    ...
+```
+```commandline    
+nginx -t
+systemctl restart nginx
+```
+
+Откройте в браузере на хосте https адрес страницы, которую обслуживает сервер nginx.
+```commandline
+![site](https://github.com/ilya-starchikov/devops-netology/blob/main/site.png)
+```
+
+Создайте скрипт, который будет генерировать новый сертификат в vault:
+    - генерируем новый сертификат так, чтобы не переписывать конфиг nginx;
+    - перезапускаем nginx для применения нового сертификата.
+
+```commandline
+vim /root/generate_cert.sh
+```
+```commandline
+#/usr/bin/env bash
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+vault write -format=json pki_int/issue/example-dot-com common_name="test.example.com" ttl="750h" > /root/test.example.com.json
+cat /root/test.example.com.json | jq -r .data.certificate > /etc/nginx/cert/test.example.com.crt
+cat /root/test.example.com.json | jq -r .data.issuing_ca >> /etc/nginx/cert/test.example.com.crt
+cat /root/test.example.com.json | jq -r .data.private_key > /etc/nginx/cert/test.example.com.key
+
+systemctl restart nginx
+
+rm /root/test.example.com.json
+```
+```commandline
+chmod +x /root/generate_cert.sh
+```
+
+Поместите скрипт в crontab, чтобы сертификат обновлялся какого-то числа каждого месяца в удобное для вас время.
+```commandline
+echo "* 0 1 * * root /root/generate_cert.sh" >> /etc/crontab
+```
