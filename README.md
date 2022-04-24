@@ -1677,7 +1677,7 @@ while True:
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-/check_ip.py
+./check_ip.py
 drive.google.com - 64.233.165.194
 [ERROR] drive.google.com IP mistmatch: None 64.233.165.194
 mail.google.com - 74.125.205.18
