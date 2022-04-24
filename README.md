@@ -1665,7 +1665,7 @@ import time
 
 hosts = {'drive.google.com': None, 'mail.google.com': None, 'google.com': None}
 
-while True: #отладочное число проверок
+while True:
   for host in hosts:
     time.sleep(2)
     ip = socket.gethostbyname(host)
