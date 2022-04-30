@@ -1762,3 +1762,70 @@ drive.google.com - 64.233.165.194
 
 Создание гетерогенной среды зависит от задач которые стоят перед компанией и размеров самой компании. Разделение на монолит и микросервисную архитектуру имеет смысл при большой компании, где есть что разделять. 
 в небольшой компании какой то одной архитектуры (монолит или микросервисы) будет достаточно.
+
+
+# Домашнее задание к занятию "5.2. Применение принципов IaaC в работе с виртуальными машинами"
+
+---
+
+## Задача 1
+
+- Опишите своими словами основные преимущества применения на практике IaaC паттернов.
+    * Ускоряет процесс разворачивания необходимой инфраструктуры 
+    * Позволяет избежать ситуаций недокументированных изменений, быстрый откат изменений и деплой новых
+    * Дает возможность быстро производить доставку кода для непрерывной его интеграции в продукте, а так же провести тестирование
+
+- Какой из принципов IaaC является основополагающим?
+    * Идемпотентность
+
+## Задача 2
+
+- Чем Ansible выгодно отличается от других систем управление конфигурациями?
+    * разработкой занимается крупная компания - RedHat
+    * не требует агентов на управляемых хостах - доступ по ssh
+- Какой, на ваш взгляд, метод работы систем конфигурации более надёжный push или pull?
+    * Pull, т.к. отсутствует единая точка отказа и хранения данных для доступа.
+
+## Задача 3
+
+Установить на личный компьютер:
+*Приложить вывод команд установленных версий каждой из программ, оформленный в markdown.*
+
+- VirtualBox
+```commandline
+$ VBoxManage --version
+6.1.30r148432
+```
+- Vagrant
+```commandline
+$ vagrant -v
+Vagrant 2.2.19
+```
+- Ansible
+```commandline
+$ ansible --version
+ansible [core 2.12.5]
+  config file = None
+  configured module search path = ['/Users/ilya/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /Users/ilya/Documents/netology/devops/ansible/ansible/lib/python3.9/site-packages/ansible
+  ansible collection location = /Users/ilya/.ansible/collections:/usr/share/ansible/collections
+  executable location = /Users/ilya/Documents/netology/devops/ansible/ansible/bin/ansible
+  python version = 3.9.10 (main, Jan 15 2022, 11:48:04) [Clang 13.0.0 (clang-1300.0.29.3)]
+  jinja version = 3.1.2
+  libyaml = True
+```
+
+## Задача 4 (*)
+
+Воспроизвести практическую часть лекции самостоятельно.
+
+- Создать виртуальную машину.
+- Зайти внутрь ВМ, убедиться, что Docker установлен с помощью команды
+```
+docker ps
+```
+```commandline
+vagrant@server1:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+vagrant@server1:~$
+```
