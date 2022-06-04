@@ -22,6 +22,27 @@
 
 ## Ответ
 
+```commandline
+oot@server1:~/6-3# cat docker-compose.yaml
+version: "3.1"
+
+volumes:
+  mysql_data: {}
+  mysql_backup: {}
+
+services:
+  mysql:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_backup:/var/backups/mysql_backup
+    restart: always
+```
+
 Изучите [бэкап БД](https://github.com/netology-code/virt-homeworks/tree/master/06-db-03-mysql/test_data) и 
 восстановитесь из него.
 ```commandline
