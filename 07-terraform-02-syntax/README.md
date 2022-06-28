@@ -4,4 +4,4 @@
 1. Ответ на вопрос: при помощи какого инструмента (из разобранных на прошлом занятии) можно создать свой образ ami?
    * Packer от Hashicorp
 2. Ссылку на репозиторий с исходной конфигурацией терраформа.
-   * 
+   * https://github.com/ilya-starchikov/devops-netology/tree/main/07-terraform-02-syntax
